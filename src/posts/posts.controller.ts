@@ -62,6 +62,7 @@ export class PostsController {
 
     return this.postsService.findAll(validPage, validLimit, (req.user as any).userId, hashtag, search);
   }
+
   @Get(':postId')
   async findOne(
     @Param('postId') postId: number,

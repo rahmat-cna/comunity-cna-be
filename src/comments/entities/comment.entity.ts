@@ -34,6 +34,12 @@ export class Comment {
   @JoinTable()
   likes: User[];
 
+  @Column({ type: 'simple-array', nullable: true })
+  images: string[];
+
+  @Column({ type: 'simple-array', nullable: true })
+  videos: string[];
+  
   // Method untuk menandai apakah ini reply
   isReply(): boolean {
     return this.parentComment !== null;
@@ -47,5 +53,18 @@ export class Comment {
   // Method untuk mengecek apakah user sudah like komentar ini
   isLikedByUser(userId: number): boolean {
     return this.likes ? this.likes.some(user => user.id === userId) : false;
+  }
+
+
+   // Method untuk menambah gambar
+   addImage(imageUrl: string) {
+    if (!this.images) this.images = [];
+    this.images.push(imageUrl);
+  }
+
+  // Method untuk menambah video
+  addVideo(videoUrl: string) {
+    if (!this.videos) this.videos = [];
+    this.videos.push(videoUrl);
   }
 }

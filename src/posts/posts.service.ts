@@ -116,7 +116,6 @@ export class PostsService {
     // // Calculate total pages
     // const totalPages = Math.ceil(total / limit);
     const posts = await queryBuilder.getMany();
-    console.log(posts);
     
     
   

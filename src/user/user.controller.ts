@@ -34,8 +34,8 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
 
-  @Get(':id')
-  async getUserWithCounts(@Param('id') id: number) {
-    return this.userService.findOne(id);
+  @Get(':username')
+  async getUserWithCounts(@Param('username') username: string) {
+    return this.userService.findOneByUsername(username);
   }
 }

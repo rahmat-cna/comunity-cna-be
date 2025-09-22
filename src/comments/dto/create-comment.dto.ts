@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString, MinLength } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsArray, IsNotEmpty, IsNumber, IsOptional, IsString, MinLength } from 'class-validator';
 
 export class CreateCommentDto {
   @IsNotEmpty()
@@ -11,6 +12,15 @@ export class CreateCommentDto {
   postId?: number;
 
   @IsOptional()
+  @Type(() => Number)   // <-- ini penting
   @IsNumber()
   parentCommentId?: number;
+
+  @IsOptional()
+  @IsArray()
+  images?: string[];
+
+  @IsOptional()
+  @IsArray()
+  videos?: string[];
 }

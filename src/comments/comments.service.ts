@@ -17,7 +17,7 @@ export class CommentsService {
 
     // Create a comment - Simplified version
     async createComment(userId: number, createCommentDto: CreateCommentDto): Promise<Comment> {
-      const { content, postId, parentCommentId } = createCommentDto;
+      const { content, postId, parentCommentId, images, videos } = createCommentDto;
   
       // Cek parent comment jika ada
       let parentComment: Comment | null = null;
@@ -36,7 +36,8 @@ export class CommentsService {
         content,
         user: { id: userId },           // ✅ Cukup assign ID user
         post: { id: postId },           // ✅ Cukup assign ID post
-        parentComment: parentComment ?? undefined,                    // ✅ Parent comment object jika ada
+        parentComment: parentComment ?? undefined,  
+        images, videos                  // ✅ Parent comment object jika ada
       });
   
       return this.commentsRepository.save(comment);
@@ -62,6 +63,7 @@ export class CommentsService {
       .leftJoinAndSelect('comment.user', 'user')
       .leftJoin('comment.likes', 'likes')
       .where('comment.postId = :postId', {postId})
+      .andWhere('comment.parentCommentId IS NULL') 
       .loadRelationCountAndMap('comment.likeCount', 'comment.likes')
       .loadRelationCountAndMap('comment.commentCount', 'comment.replies')
       .getManyAndCount()
@@ -71,10 +73,28 @@ export class CommentsService {
 
      // Get comment by ID
   async getCommentById(commentId: number): Promise<Comment> {
-    const comment = await this.commentsRepository.findOne({
-      where: { id: commentId },
-      relations: ['user', 'post', 'parentComment', 'replies', 'replies.user']
-    });
+    const comment = await this.commentsRepository
+      .createQueryBuilder('comment')
+      .leftJoinAndSelect('comment.user', 'user')
+      .leftJoin('comment.likes', 'commentLikes')
+      .where('comment.id = :commentId', { commentId })
+      .loadRelationCountAndMap('comment.likeCount', 'comment.likes')
+      .loadRelationCountAndMap('comment.commentCount', 'comment.replies')
+      .leftJoinAndSelect('comment.replies', 'replies')
+      .leftJoinAndSelect('replies.user', 'userReplay')
+      .leftJoinAndSelect('comment.post', 'post')
+      .leftJoinAndSelect('post.user', 'userPost')
+      .leftJoin('post.likes', 'postLikes')
+      .leftJoin('post.comments', 'postComments')
+      .loadRelationCountAndMap('post.likeCount', 'post.likes')
+      .loadRelationCountAndMap('post.commentCount', 'post.comments')
+      .getOne();
+
+
+    // const comment = await this.commentsRepository.findOne({
+    //   where: { id: commentId },
+    //   relations: ['user', 'post', 'parentComment', 'replies', 'replies.user']
+    // });
 
     if (!comment) {
       throw new NotFoundException('Comment not found');

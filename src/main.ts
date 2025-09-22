@@ -36,7 +36,9 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   app.useGlobalPipes(
     new ValidationPipe({
-      transform: true,
+      transform: true,          // wajib biar @Type jalan
+      whitelist: true,          // optional, biar field asing dibuang
+      forbidNonWhitelisted: true,
     }),
   );
 

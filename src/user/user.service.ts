@@ -40,6 +40,19 @@ export class UserService {
 
     throw new HttpException('User Not Found', HttpStatus.NOT_FOUND);
   }
+  async findOneByUsername(username: string) {
+     const user = await this.userRepository
+      .createQueryBuilder('user')
+      .loadRelationCountAndMap('user.followersCount', 'user.followers')
+      .loadRelationCountAndMap('user.followingCount', 'user.following')
+      .where('user.username = :username', { username })
+      .getOne();
+    if (user) {
+      return user;
+    }
+
+    throw new HttpException('User Not Found', HttpStatus.NOT_FOUND);
+  }
 
   findOneUsernameOrEmail(val: any) {
     return this.userRepository.findOneOrFail({
