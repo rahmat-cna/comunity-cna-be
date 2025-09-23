@@ -50,10 +50,15 @@ export class PostsService {
   async findPostsBySimilarHashtag(tag: string) {
     return this.postsRepository
       .createQueryBuilder('post')
-      .innerJoin('post.postHashtags', 'ph')
-      .innerJoin('ph.hashtag', 'hashtag')
+
+      .leftJoinAndSelect('post.postHashtags', 'ph')
+      .leftJoinAndSelect('ph.hashtag', 'hashtag')
+      .leftJoin('post.likes', 'likes')
+      .leftJoin('post.comments', 'comments')
+      .loadRelationCountAndMap('post.likeCount', 'post.likes')
+      .loadRelationCountAndMap('post.commentCount', 'post.comments')
       .leftJoinAndSelect('post.user', 'user')
-      .where('similarity(hashtag.name, :tag) > 0.2', { tag }) // ambil yang mirip di atas threshold
+      .where('similarity(hashtag.name, :tag) > 0.1', { tag }) // ambil yang mirip di atas threshold
       .orderBy('similarity(hashtag.name, :tag)', 'DESC') // urutkan dari paling mirip
       .getMany();
   }
