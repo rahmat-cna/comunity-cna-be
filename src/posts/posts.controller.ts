@@ -47,6 +47,12 @@ export class PostsController {
     return this.postsService.create({content: body.content, images, videos}, followerId)
   }
 
+  @Get('hashtag/:tag')
+  async getByHashtag(@Param('tag') tag: string) {
+    return this.postsService.findPostsBySimilarHashtag(tag);
+  }
+
+
   @Get()
   async findAll(
     @Req() req: Request,
@@ -69,5 +75,12 @@ export class PostsController {
 
   ) {
     return this.postsService.findOne(postId);
+  }
+  @Get(':username/me')
+  async findOneByUsername(
+    @Param('username') username: string,
+
+  ) {
+    return this.postsService.findOneByUsername(username);
   }
 }

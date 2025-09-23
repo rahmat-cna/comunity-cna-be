@@ -35,7 +35,8 @@ export class UserController {
   }
 
   @Get(':username')
-  async getUserWithCounts(@Param('username') username: string) {
-    return this.userService.findOneByUsername(username);
+    
+    async getUserWithCounts(@Param('username') username: string, @Req() req: Request) {
+    return this.userService.findOneByUsername(username, req.user.userId);
   }
 }

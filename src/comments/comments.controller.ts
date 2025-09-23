@@ -37,13 +37,16 @@ export class CommentsController {
     const images: string[] = [];
     const videos: string[] = [];
 
-    files.forEach(file => {
-      if (file.mimetype.startsWith('image/')) {
-        images.push(file.filename); // bisa juga pakai file.path
-      } else if (file.mimetype.startsWith('video/')) {
-        videos.push(file.filename);
-      }
-    });
+    if (files) {
+      files.forEach(file => {
+        if (file.mimetype.startsWith('image/')) {
+          images.push(file.filename); // bisa juga pakai file.path
+        } else if (file.mimetype.startsWith('video/')) {
+          videos.push(file.filename);
+        }
+      });
+      
+    }
     
 
     const userId = req.user.userId; // ambil userId dari request (misalnya dari JWT)

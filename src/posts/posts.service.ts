@@ -33,6 +33,32 @@ export class PostsService {
     return 'This action adds a new post';
   }
 
+  async findOneByUsername(username: string) {
+    const queryBuilder = this.postsRepository
+    .createQueryBuilder('post')
+    .leftJoinAndSelect('post.user', 'user')
+    .leftJoin('post.likes', 'likes')
+    .leftJoin('post.comments', 'comments')
+    .loadRelationCountAndMap('post.likeCount', 'post.likes')
+    .loadRelationCountAndMap('post.commentCount', 'post.comments')
+    .where('user.username =:username', {username})
+    .orderBy('post.createdAt', 'DESC')
+    return await queryBuilder.getManyAndCount();
+
+  }
+
+  async findPostsBySimilarHashtag(tag: string) {
+    return this.postsRepository
+      .createQueryBuilder('post')
+      .innerJoin('post.postHashtags', 'ph')
+      .innerJoin('ph.hashtag', 'hashtag')
+      .leftJoinAndSelect('post.user', 'user')
+      .where('similarity(hashtag.name, :tag) > 0.2', { tag }) // ambil yang mirip di atas threshold
+      .orderBy('similarity(hashtag.name, :tag)', 'DESC') // urutkan dari paling mirip
+      .getMany();
+  }
+  
+
   async findAll(
     page: number = 1,
     limit: number = 10,
@@ -81,6 +107,8 @@ export class PostsService {
     )
     // ✅ LOAD apakah user sudah like post ini
     .orderBy('post.createdAt', 'DESC')
+    return await queryBuilder.getManyAndCount();
+
     
   
     // // Apply filters
@@ -115,11 +143,10 @@ export class PostsService {
   
     // // Calculate total pages
     // const totalPages = Math.ceil(total / limit);
-    const posts = await queryBuilder.getMany();
+    // const posts = await queryBuilder.getMany();
     
     
   
-    return await queryBuilder.getManyAndCount();
   }
 
 

@@ -24,7 +24,7 @@ export class FollowersController {
     @Param('id') followingId: number,
     @Req() req: Request
   ) {
-    const followerId = (req.user as any).id;
+    const followerId = (req.user as any).userId;
     return this.followersService.unfollowUser(followerId, followingId);
   }
 

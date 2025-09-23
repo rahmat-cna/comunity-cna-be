@@ -65,6 +65,10 @@ export class User {
     return this.likes?.length || 0;
   }
 
+  hasFollowed(userId: number): boolean {
+    return this.following?.some(f => f.following.id === userId) || false;
+  }
+
   // Method untuk mendapatkan jumlah comment yang dibuat user
   getTotalComments(): number {
     return this.comments?.length || 0;
