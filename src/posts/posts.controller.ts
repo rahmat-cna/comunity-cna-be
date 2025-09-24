@@ -25,7 +25,7 @@ export class PostsController {
     }),
   )
   async createPost(
-    @Body() body: { userId: number; content: string },
+    @Body() body: { userId: number; content: string; gifs: string },
     @UploadedFiles() files: Express.Multer.File[],
     @Req() req: Request
   ) {
@@ -44,7 +44,8 @@ export class PostsController {
 
     const followerId = (req.user as any).userId;
 
-    return this.postsService.create({content: body.content, images, videos}, followerId)
+
+    return this.postsService.create({content: body.content, images, videos, gifs: body.gifs}, followerId)
   }
 
   @Get('hashtag/:tag')

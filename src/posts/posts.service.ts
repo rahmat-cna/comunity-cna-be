@@ -1,10 +1,11 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
 import { Repository } from 'typeorm';
 import { HashtagsService } from 'src/hashtags/hashtags.service';
+import { GifValidatorService } from './gif-validator.service';
 
 @Injectable()
 export class PostsService {
@@ -14,22 +15,41 @@ export class PostsService {
 
     @Inject(forwardRef(() => HashtagsService))
     private hashtagsService: HashtagsService,
+
+    private readonly gifValidator: GifValidatorService
     
   ){}
   async create(createPostDto: CreatePostDto, userId: number) {
     
+
+    let gifs = createPostDto.gifs ? JSON.parse(createPostDto.gifs) : []
+    
+    
     // Create post
+    if (gifs && gifs.length > 0) {
+        const results = await Promise.all(
+          gifs.map((url) => this.gifValidator.validateGifUrl(url))
+        );
+
+        // kalau ada yg false
+        if (results.includes(false)) {
+          throw new BadRequestException('One or more GIF URLs are invalid');
+        }
+    }
     const post = this.postsRepository.create({
       content: createPostDto.content,
       images: createPostDto.images,
       videos: createPostDto.videos,
-      user: { id: userId }
+      user: { id: userId },
+      gifs,
     });
+    
+
     const savedPost = await this.postsRepository.save(post);
      // Process hashtags jika ada content
-     if (createPostDto.content) {
+    if (createPostDto.content) {
       await this.hashtagsService.processPostHashtags(savedPost, createPostDto.content);
-     }
+    }
     return 'This action adds a new post';
   }
 

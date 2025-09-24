@@ -19,6 +19,9 @@ export class Post {
   @Column({ type: 'simple-array', nullable: true })
   videos: string[];
 
+  @Column({ type: 'simple-array', nullable: true })
+  gifs: string[];
+
   @CreateDateColumn()
   createdAt: Date;
 

@@ -1,0 +1,13 @@
+version: '3.9'
+
+services:
+  nest-app:
+    build: .
+    container_name: nest-dev
+    ports:
+      - "5000:5000"       # akses http://localhost:3000
+    volumes:
+      - .:/usr/src/app    # sync folder lokal ke container
+      - /usr/src/app/node_modules # biar node_modules tetap di container
+    command: npm run start:dev
+

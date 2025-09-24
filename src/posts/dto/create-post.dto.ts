@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import { IsOptional, IsString, IsArray, IsNumber } from 'class-validator';
 
 export class CreatePostDto {
@@ -12,5 +13,9 @@ export class CreatePostDto {
   @IsOptional()
   @IsArray()
   videos?: string[];
+
+  @IsOptional()
+  @IsString()
+  gifs?: string;
 
 }
